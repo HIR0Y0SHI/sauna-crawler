@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "sauna-crawler"
+version = "0.1.0"
+description = ""
+authors = ["Hiroyoshi Matsumoto <bardiche.assault7@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+webdriver-manager = "^3.8.3"
+selenium = "^4.3.0"
+slack-sdk = "^3.18.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
