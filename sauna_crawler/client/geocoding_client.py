@@ -1,3 +1,4 @@
+import urllib.parse
 import urllib.request
 from urllib.request import Request
 import xml.etree.ElementTree as ET
@@ -26,7 +27,7 @@ class GeocodingClient:
     lat = ''
     lng = ''
     
-    self.logger.info("Start Geocoding HTTP Request [{}]".format(query))
+    self.logger.info("Start Geocoding HTTP Request [{}]".format(url_params))
     
     try:
       # HTTPリクエスト

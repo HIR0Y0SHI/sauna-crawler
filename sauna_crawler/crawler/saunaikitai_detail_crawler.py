@@ -56,10 +56,10 @@ class SaunaikitaiDetailCrawler:
         
         try:
             #施設ページを開く
-            self.logger.info(url)
             driver.get(url)
 
-            self.logger.info("Start analysis of facility page!")
+            self.logger.info("================= Start analysis of facility page ! =================")
+            self.logger.info(url)
             
             # ユーザ評価
             ## イキタイ
@@ -118,7 +118,7 @@ class SaunaikitaiDetailCrawler:
             sauna_info.append(location[1])
             
 
-            self.logger.info("===== Sauna INFO [" + sauna_name + "] =====")
+            self.logger.debug("===== Sauna INFO [" + sauna_name + "] =====")
             self.logger.debug("イキタイ: " + ikitai_count)
             self.logger.debug("サ活: " + sakatsu_count)
             self.logger.debug("サ飯: " + sameshi_count)
@@ -134,6 +134,8 @@ class SaunaikitaiDetailCrawler:
             self.logger.debug("経度:" + location[1])
             self.logger.debug("====================================================")
             
+            self.logger.info("================= [{}] page analysis completed ! =================".format(sauna_name))
+            
 
         except NoSuchElementException as e:
             self.logger.error("NoSuchElementException!! ")
@@ -143,8 +145,6 @@ class SaunaikitaiDetailCrawler:
             self.logger.error("Unknown error!!")
             self.logger.info("Error File : {}".format(__file__))
             self.logger.info(e)
-            
-        self.logger.info("Analysis completed!")
         
         
         
@@ -170,20 +170,33 @@ class SaunaikitaiDetailCrawler:
     # 緯度経度を取得する
     def get_location(self, sauna_name, address):
         client = GeocodingClient()
-        location = client.request(sauna_name)
+        
         
         lat = ''
         lng = ''
         
-        # まずは施設名から取得
-        if location is not None:
-            return (location[0], location[1])
-        
-        self.logger.warn("Failure to obtain location information by sauna name. [{}]".format(sauna_name))
+        # 施設名に「&」が含まれてたら失敗するので、含まれてる場合は施設名検索を省く
+        if '&' not in sauna_name:
+            location = client.request(sauna_name)
+            
+            # まずは施設名から取得
+            if location is not None:
+                self.logger.info("緯度：{}".format(location[0]))
+                self.logger.info("経度：{}".format(location[1]))
+                
+                # 緯度経度が0であれば、住所から検索し直す
+                if not (location[0] == '0' or location[1] == '0'):
+                    return (location[0], location[1])
+                
+                self.logger.warn("Latitude and longitude are zero.")
+            
+            self.logger.warn("Failure to obtain location information by sauna name. [{}]".format(sauna_name))
         
         # 施設名で失敗した時は住所で
         location = client.request(address)
         if location is not None:
+            self.logger.info("緯度：{}".format(location[0]))
+            self.logger.info("経度：{}".format(location[1]))
             return (location[0], location[1])
         
         self.logger.error("Failure to obtain location information by address. [{}]".format(address))
