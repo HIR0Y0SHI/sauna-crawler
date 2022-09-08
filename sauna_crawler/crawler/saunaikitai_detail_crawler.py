@@ -1,5 +1,6 @@
 from audioop import add
 from lib2to3.pgen2 import driver
+import platform
 import os
 from pydoc import cli
 import time
@@ -7,6 +8,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome import service as fs
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service 
 from selenium.common.exceptions import NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 from original_logger import OriginalLogger
@@ -40,7 +42,12 @@ class SaunaikitaiDetailCrawler:
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('useAutomationExtension', False)
         options.page_load_strategy = 'eager'
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+        
+        # Raspberry piの場合独自のdriverに
+        if platform.node() == 'raspberrypi':
+            driver = webdriver.Chrome(service=Service('/usr/bin/chromedriver'), options=options)
+        else:
+            driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
         
         # find_elementの際、要素が見つかるまで指定した最大時間待機
         driver.implicitly_wait(5)

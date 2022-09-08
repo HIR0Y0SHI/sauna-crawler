@@ -50,7 +50,12 @@ class SaunaikitaiCrawler:
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('useAutomationExtension', False)
         options.page_load_strategy = 'eager'
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+        
+        # Raspberry piの場合独自のdriverに
+        if platform.node() == 'raspberrypi':
+            driver = webdriver.Chrome(service=Service('/usr/bin/chromedriver'), options=options)
+        else:
+            driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
         
         # find_elementの際、要素が見つかるまで指定した最大時間待機
         driver.implicitly_wait(5)
