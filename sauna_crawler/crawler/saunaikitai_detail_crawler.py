@@ -130,9 +130,11 @@ class SaunaikitaiDetailCrawler:
 
         except NoSuchElementException as e:
             self.logger.error("NoSuchElementException!! ")
+            self.logger.info("Error File : {}".format(__file__))
             self.logger.info(e)
         except Exception as e:
             self.logger.error("Unknown error!!")
+            self.logger.info("Error File : {}".format(__file__))
             self.logger.info(e)
             
         self.logger.info("Analysis completed!")
@@ -170,14 +172,14 @@ class SaunaikitaiDetailCrawler:
         if location is not None:
             return (location[0], location[1])
         
-        self.logger.warn("Failure to obtain location information by sauna name. {}".format(sauna_name))
+        self.logger.warn("Failure to obtain location information by sauna name. [{}]".format(sauna_name))
         
         # 施設名で失敗した時は住所で
         location = client.request(address)
         if location is not None:
             return (location[0], location[1])
         
-        self.logger.error("Failure to obtain location information by address. {}".format(address))
+        self.logger.error("Failure to obtain location information by address. [{}]".format(address))
         
         return (lat, lng)
         

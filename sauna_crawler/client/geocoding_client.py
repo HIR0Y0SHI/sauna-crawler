@@ -51,12 +51,14 @@ class GeocodingClient:
           
     except urllib.error.URLError as e:
       self.logger.error("URLError!!")
+      self.logger.info("Error File : {}".format(__file__))
       self.logger.info(e)
       pass
       
     except Exception as e:
       self.logger.error("Unknown error!!")
       self.logger.info(e)
+      self.logger.info("Error File : {}".format(__file__))
       pass
     
     

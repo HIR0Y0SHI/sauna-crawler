@@ -9,6 +9,7 @@ from unittest import result
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome import service as fs
+from selenium.webdriver.chrome.service import Service 
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
@@ -85,6 +86,7 @@ class SaunaikitaiCrawler:
                     driver.get(SaunaikitaiCrawler.SAUNA_SEARCH_URL_FORMAT.format(i + 1))
                     
                     # ページ中のリンクを取得する
+                    self.logger.info("###############################################")
                     self.logger.info("Start Sauna Search Page : {0}".format(i + 1))
                     all_links =  driver.find_elements(by=By.XPATH, value='//a[@href]')
                     
@@ -114,9 +116,11 @@ class SaunaikitaiCrawler:
 
         except NoSuchElementException as e:
             self.logger.error("NoSuchElementException!!")
+            self.logger.info("Error File : {}".format(__file__))
             self.logger.info(e)
         except Exception as e:
             self.logger.error("Unknown error!!")
+            self.logger.info("Error File : {}".format(__file__))
             self.logger.info(e)
             
         self.logger.info("Analysis completed!")

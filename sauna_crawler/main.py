@@ -11,8 +11,8 @@ start_time = time.time()
 crawler = SaunaikitaiCrawler()
 detail_crawler = SaunaikitaiDetailCrawler()
 
-# crawler.crawl()
-detail_crawler.crawl('https://sauna-ikitai.com/saunas/4393')
+crawler.crawl()
+# detail_crawler.crawl('https://sauna-ikitai.com/saunas/4393')
 
 elapsed_time = time.time() - start_time
 
