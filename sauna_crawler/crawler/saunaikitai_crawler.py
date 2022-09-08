@@ -27,7 +27,7 @@ class SaunaikitaiCrawler:
     
     
     def __init__(self):
-         # Loggerの生成
+        # Loggerの生成
         self.logger = OriginalLogger()
         
         
@@ -76,7 +76,7 @@ class SaunaikitaiCrawler:
             with open(self.DATA_FILE_PATH, 'w') as f:
                 writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_NONNUMERIC)
                 
-                csv_header = ['イキタイ', 'サ活', 'サウナ飯', 'ターゲット', '市区町村', '施設名', '施設タイプ', '住所', 'TEL', 'HP', '定休日', '営業時間', '料金', 'URL', 'CREATE_AT']
+                csv_header = ['イキタイ', 'サ活', 'サウナ飯', 'ターゲット', '市区町村', '施設名', '施設タイプ', '住所', 'TEL', 'HP', '定休日', '営業時間', '料金', 'URL', 'CREATE_AT', '緯度', '経度']
                 writer.writerow(csv_header)
                 
                 #  全てのページを読み終わるまでループする
@@ -115,7 +115,7 @@ class SaunaikitaiCrawler:
         except NoSuchElementException as e:
             self.logger.error("NoSuchElementException!!")
             self.logger.info(e)
-        except e:
+        except Exception as e:
             self.logger.error("Unknown error!!")
             self.logger.info(e)
             

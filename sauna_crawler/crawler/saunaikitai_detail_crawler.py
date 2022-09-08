@@ -1,5 +1,7 @@
+from audioop import add
 from lib2to3.pgen2 import driver
 import os
+from pydoc import cli
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -8,6 +10,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 from original_logger import OriginalLogger
+from client.geocoding_client import GeocodingClient
 
 class SaunaikitaiDetailCrawler:
     
@@ -86,19 +89,26 @@ class SaunaikitaiDetailCrawler:
             sauna_info.append(hp)
             ## 定休日
             regular_holiday = driver.find_element(by=By.CSS_SELECTOR, value='body > div.l-page > div.l-containers.js-containers > div:nth-child(1) > article > div.p-saunaDetailBody > div.p-saunaDetailShop > div > div.p-saunaDetailShop_info > table > tbody > tr:nth-child(8) > td').text
-            sauna_info.append('\\n'.join(regular_holiday.splitlines()))
+            sauna_info.append('\\n'.join(regular_holiday.splitlines())) # 改行コードを置換
             ## 営業時間
             business_hours = driver.find_element(by=By.CSS_SELECTOR, value='body > div.l-page > div.l-containers.js-containers > div:nth-child(1) > article > div.p-saunaDetailBody > div.p-saunaDetailShop > div > div.p-saunaDetailShop_info > table > tbody > tr:nth-child(9) > td').text
-            sauna_info.append('\\n'.join(business_hours.splitlines()))
+            sauna_info.append('\\n'.join(business_hours.splitlines())) # 改行コードを置換
             ## 料金
             price = driver.find_element(by=By.CSS_SELECTOR, value='body > div.l-page > div.l-containers.js-containers > div:nth-child(1) > article > div.p-saunaDetailBody > div.p-saunaDetailShop > div > div.p-saunaDetailShop_info > table > tbody > tr:nth-child(10) > td').text
-            sauna_info.append('\\n'.join(price.splitlines()))
+            sauna_info.append('\\n'.join(price.splitlines())) # 改行コードを置換
             
             # URL
             sauna_info.append(url)
             # 時間
             create_at = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime())
             sauna_info.append(create_at)
+            
+            # 緯度経度の取得
+            location = self.get_location(sauna_name, address)
+            ## 緯度
+            sauna_info.append(location[0])
+            ## 経度
+            sauna_info.append(location[1])
             
 
             self.logger.info("===== Sauna INFO [" + sauna_name + "] =====")
@@ -113,13 +123,15 @@ class SaunaikitaiDetailCrawler:
             self.logger.debug("定休日: " + regular_holiday)
             self.logger.debug("営業時間: " + business_hours)
             self.logger.debug("料金:" + price)
+            self.logger.debug("緯度:" + location[0])
+            self.logger.debug("経度:" + location[1])
             self.logger.debug("====================================================")
             
 
         except NoSuchElementException as e:
             self.logger.error("NoSuchElementException!! ")
             self.logger.info(e)
-        except e:
+        except Exception as e:
             self.logger.error("Unknown error!!")
             self.logger.info(e)
             
@@ -143,7 +155,30 @@ class SaunaikitaiDetailCrawler:
         driver.close()
         driver.quit()
         
-        
         return sauna_info
+    
+    
+    # 緯度経度を取得する
+    def get_location(self, sauna_name, address):
+        client = GeocodingClient()
+        location = client.request(sauna_name)
+        
+        lat = ''
+        lng = ''
+        
+        # まずは施設名から取得
+        if location is not None:
+            return (location[0], location[1])
+        
+        self.logger.warn("Failure to obtain location information by sauna name. {}".format(sauna_name))
+        
+        # 施設名で失敗した時は住所で
+        location = client.request(address)
+        if location is not None:
+            return (location[0], location[1])
+        
+        self.logger.error("Failure to obtain location information by address. {}".format(address))
+        
+        return (lat, lng)
         
         
