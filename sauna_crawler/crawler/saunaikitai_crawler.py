@@ -51,6 +51,18 @@ class SaunaikitaiCrawler:
         options.add_experimental_option('useAutomationExtension', False)
         options.page_load_strategy = 'eager'
         
+        # timeout対策
+        # https://qiita.com/ssbb/items/306ec9a1dbecd77d001b
+        # https://stackoverflow.com/questions/48450594/selenium-timed-out-receiving-message-from-renderer
+        options.add_argument("start-maximized")
+        options.add_argument("enable-automation")
+        options.add_argument("--disable-browser-side-navigation")
+        options.add_argument("--disable-infobars")
+        options.add_argument('--ignore-certificate-errors')
+        options.add_argument('--ignore-ssl-errors')
+        prefs = {"profile.default_content_setting_values.notifications" : 2}
+        options.add_experimental_option("prefs",prefs)
+        
         # Raspberry piの場合独自のdriverに
         if platform.node() == 'raspberrypi':
             driver = webdriver.Chrome(service=Service('/usr/bin/chromedriver'), options=options)
