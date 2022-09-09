@@ -1,7 +1,11 @@
 import logging
 from logging import getLogger, config
+from os.path import expanduser
 
 class OriginalLogger:
+    
+    LOG_FILE_PATH = '{}/log/sauna-crawler/application.log'.format(expanduser("~"))
+    
     def __init__(self):        
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
@@ -14,6 +18,12 @@ class OriginalLogger:
             ch_formatter = logging.Formatter('%(asctime)s [%(levelname)s] - %(message)s', '%Y-%m-%d %H:%M:%S')
             ch.setFormatter(ch_formatter)
             self.logger.addHandler(ch)
+            
+            # ログファイルの設定
+            fh = logging.FileHandler(self.LOG_FILE_PATH)
+            fh.setLevel(logging.INFO)
+            fh.setFormatter(ch_formatter)
+            self.logger.addHandler(fh)
     
     def debug(self, message):
         self.logger.debug(message)
