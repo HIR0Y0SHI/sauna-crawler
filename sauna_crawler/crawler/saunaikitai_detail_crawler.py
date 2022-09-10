@@ -1,5 +1,4 @@
 from audioop import add
-from lib2to3.pgen2 import driver
 import platform
 import os
 from pydoc import cli
@@ -30,45 +29,7 @@ class SaunaikitaiDetailCrawler:
     # url: サウナイキタイの施設ページ
     # 例) https://sauna-ikitai.com/saunas/4393
     @retry(stop=stop_after_attempt(3))
-    def crawl(self, url):
-        # chromedriverの設定
-        options = Options()
-        options.add_argument('--headless')
-        options.add_argument('--disable-extensions')
-        options.add_argument('--disable-gpu')                             
-        options.add_argument('--proxy-server="direct://"')         
-        options.add_argument('--proxy-bypass-list=*')              
-        options.add_argument('--blink-settings=imagesEnabled=false')
-        options.add_argument('--lang=ja')                          
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
-        options.add_argument("--log-level=3")
-        options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36')
-        options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        options.add_experimental_option('useAutomationExtension', False)
-        options.page_load_strategy = 'eager'
-        
-        # timeout対策
-        # Error : from timeout: Timed out receiving message from renderer: 600.000
-        # https://qiita.com/ssbb/items/306ec9a1dbecd77d001b
-        # https://stackoverflow.com/questions/48450594/selenium-timed-out-receiving-message-from-renderer
-        options.add_argument("start-maximized")
-        options.add_argument("enable-automation")
-        options.add_argument("--disable-browser-side-navigation")
-        options.add_argument("--disable-infobars")
-        options.add_argument('--ignore-certificate-errors')
-        options.add_argument('--ignore-ssl-errors')
-        prefs = {"profile.default_content_setting_values.notifications" : 2}
-        options.add_experimental_option("prefs",prefs)
-        
-        # Raspberry piの場合独自のdriverに
-        if platform.node() == 'raspberrypi':
-            driver = webdriver.Chrome(service=Service('/usr/bin/chromedriver'), options=options)
-        else:
-            driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-        
-        # find_elementの際、要素が見つかるまで指定した最大時間待機
-        driver.implicitly_wait(5)
+    def crawl(self, url, driver):
         
         sauna_info = []
         
@@ -176,11 +137,6 @@ class SaunaikitaiDetailCrawler:
         # driver.save_screenshot(self.FILENAME)
         # self.logger.info(self.FILENAME)
         # /-------------- SSを取る場合の設定 --------------
-        
-        # chromedriverのclose
-        # driverの操作を完全に終えてからcloseすること
-        driver.close()
-        driver.quit()
         
         return sauna_info
     

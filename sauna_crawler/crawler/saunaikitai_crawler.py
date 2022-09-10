@@ -121,7 +121,7 @@ class SaunaikitaiCrawler:
                     # 取得した施設詳細リンクから施設情報を取得
                     for detail_link in sauna_detail_links:
                         detail_crawler = SaunaikitaiDetailCrawler()
-                        sauna_info_list.append(detail_crawler.crawl(detail_link))
+                        sauna_info_list.append(detail_crawler.crawl(detail_link, driver))
                     
                     # 1ページ単位で書き込み
                     writer.writerows(sauna_info_list)
