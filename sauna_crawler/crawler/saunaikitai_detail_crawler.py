@@ -4,6 +4,7 @@ import platform
 import os
 from pydoc import cli
 import time
+import logging
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome import service as fs
@@ -13,10 +14,13 @@ from selenium.common.exceptions import NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 from original_logger import OriginalLogger
 from client.geocoding_client import GeocodingClient
+from tenacity import retry, stop_after_attempt, before_log, after_log
 
 class SaunaikitaiDetailCrawler:
     
     FILENAME = os.path.join(os.path.dirname(os.path.abspath(__file__)), "image/detail.png")
+    
+    logger = OriginalLogger()
 
     
     def __init__(self):
@@ -25,6 +29,7 @@ class SaunaikitaiDetailCrawler:
         
     # url: サウナイキタイの施設ページ
     # 例) https://sauna-ikitai.com/saunas/4393
+    @retry(stop=stop_after_attempt(3))
     def crawl(self, url):
         # chromedriverの設定
         options = Options()
@@ -149,7 +154,6 @@ class SaunaikitaiDetailCrawler:
             
             self.logger.info("================= [{}] page analysis completed ! =================".format(sauna_name))
             
-
         except NoSuchElementException as e:
             self.logger.error("NoSuchElementException!! ")
             self.logger.info("Error File : {}".format(__file__))
@@ -158,19 +162,20 @@ class SaunaikitaiDetailCrawler:
             self.logger.error("Unknown error!!")
             self.logger.info("Error File : {}".format(__file__))
             self.logger.info(e)
+            raise Exception
         
-        
-        
+        # -------------- SSを取る場合の設定 --------------
         # get width and height of the page
-        w = driver.execute_script("return document.body.scrollWidth;")
-        h = driver.execute_script("return document.body.scrollHeight;")
+        # w = driver.execute_script("return document.body.scrollWidth;")
+        # h = driver.execute_script("return document.body.scrollHeight;")
 
         # set window size
-        driver.set_window_size(w,h)
+        # driver.set_window_size(w,h)
 
         # Get Screen Shot
         # driver.save_screenshot(self.FILENAME)
         # self.logger.info(self.FILENAME)
+        # /-------------- SSを取る場合の設定 --------------
         
         # chromedriverのclose
         # driverの操作を完全に終えてからcloseすること
