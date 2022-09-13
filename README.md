@@ -12,6 +12,15 @@ poetry install
 poetry run python sauna_crawler/main.py
 ```
 
+## Raspberry piで動かす場合
+
+Raspberry piの場合、driverのインストールで意図しないものが入るのと独自のdriverを使わないといけないので
+`chromium-chromedriver`をインストールしておく。
+
+```bash
+sudo apt install chromium-chromedriver
+```
+
 ## ログファイル
 
 ```
