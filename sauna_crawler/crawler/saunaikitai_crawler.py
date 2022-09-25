@@ -15,6 +15,7 @@ from selenium.common.exceptions import NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 from original_logger import OriginalLogger
 from crawler.saunaikitai_detail_crawler import SaunaikitaiDetailCrawler
+from sauna_crawler.slack.slack_util import SlackUtil
 
 class SaunaikitaiCrawler:
     SAUNA_SEARCH_URL = 'https://sauna-ikitai.com/search?prefecture[]=hokkaido&prefecture[]=aomori&prefecture[]=iwate&prefecture[]=miyagi&prefecture[]=akita&prefecture[]=yamagata&prefecture[]=fukushima&prefecture[]=ibaraki&prefecture[]=tochigi&prefecture[]=gunma&prefecture[]=saitama&prefecture[]=chiba&prefecture[]=tokyo&prefecture[]=kanagawa&prefecture[]=niigata&prefecture[]=toyama&prefecture[]=ishikawa&prefecture[]=fukui&prefecture[]=yamanashi&prefecture[]=nagano&prefecture[]=gifu&prefecture[]=shizuoka&prefecture[]=aichi&prefecture[]=mie&prefecture[]=shiga&prefecture[]=kyoto&prefecture[]=osaka&prefecture[]=hyogo&prefecture[]=nara&prefecture[]=wakayama&prefecture[]=tottori&prefecture[]=shimane&prefecture[]=okayama&prefecture[]=hiroshima&prefecture[]=yamaguchi&prefecture[]=tokushima&prefecture[]=kagawa&prefecture[]=ehime&prefecture[]=kochi&prefecture[]=fukuoka&prefecture[]=saga&prefecture[]=nagasaki&prefecture[]=kumamoto&prefecture[]=oita&prefecture[]=miyazaki&prefecture[]=kagoshima&prefecture[]=okinawa&ordering=ikitai_counts_desc'
@@ -94,7 +95,9 @@ class SaunaikitaiCrawler:
             with open(self.DATA_FILE_PATH, 'w') as f:
                 writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_NONNUMERIC)
                 
-                csv_header = ['イキタイ', 'サ活', 'サウナ飯', 'ターゲット', '市区町村', '施設名', '施設タイプ', '住所', 'TEL', 'HP', '定休日', '営業時間', '料金', 'URL', 'CREATE_AT', '緯度', '経度']
+                # csv_header = ['イキタイ', 'サ活', 'サウナ飯', 'ターゲット', '市区町村', '施設名', '施設タイプ', '住所', 'TEL', 'HP', '定休日', '営業時間', '料金', 'URL', 'CREATE_AT', '緯度', '経度']
+                csv_header = ['ikitai', 'sakatsu', 'sameshi', 'target', 'city', 'facility_name', 'facility_type', 'address', 'tel', 'hp', 'regular_holiday', 'business_hours', 'price', 'url', 'create_at', 'latitude', 'longitude']
+
                 writer.writerow(csv_header)
                 
                 #  全てのページを読み終わるまでループする
@@ -105,7 +108,7 @@ class SaunaikitaiCrawler:
                     # ページ中のリンクを取得する
                     self.logger.info("###############################################")
                     self.logger.info("Start Sauna Search Page : {0}".format(i + 1))
-                    all_links =  driver.find_elements(by=By.XPATH, value='//a[@href]')
+                    all_links = driver.find_elements(by=By.XPATH, value='//a[@href]')
                     
                     # サウナ施設情報リスト
                     sauna_info_list = []
